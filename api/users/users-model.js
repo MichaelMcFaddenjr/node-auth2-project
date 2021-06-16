@@ -36,7 +36,11 @@ function findBy(filter) {
         "role_name": "admin",
       }
     ]
-   */
+   */  
+  return db('users')
+    .join ('roles', 'users.role_id', 'roles.role_id')
+    .select('user_id', 'username', 'password', 'role_name')
+    .where(filter)
 }
 
 function findById(user_id) {
