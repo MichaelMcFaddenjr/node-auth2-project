@@ -25,7 +25,7 @@ const restricted = (req, res, next) => {
         message: 'Token required',
       })
     } else {
-      jwt.verify(toke, JWT_SECRET, (err, decoded) => {
+      jwt.verify(token, JWT_SECRET, (err, decoded) => {
         if (err) {
           res.status(401).json({
             message: 'Token invalid'
@@ -39,7 +39,7 @@ const restricted = (req, res, next) => {
   next()
 }
 
-const only = role_name => (req, res, next) => {
+const only = (role_name) => (req, res, next) => {
   /*
     If the user does not provide a token in the Authorization header with a role_name
     inside its payload matching the role_name passed to this function as its argument:
@@ -71,7 +71,7 @@ const checkUsernameExists = async (req, res, next) => {
   try {
     const [user] = await findBy({ username: req.body.username })
     if (!user) {
-      next({ status:422, message: 'Invalid credentials'})
+      next({ status:401, message: 'Invalid credentials'})
     } else {
       req.user = user;
       next()
@@ -101,7 +101,7 @@ const validateRoleName = (req, res, next) => {
       "message": "Role name can not be longer than 32 chars"
     }
   */
- if(!req.body.role_name || !req.body.role_name. trim()) {
+ if(!req.body.role_name || !req.body.role_name.trim()) {
    req.role_name = 'student'
    next()
  } else if (req.body.role_name.trim() === 'admin') {
@@ -109,6 +109,7 @@ const validateRoleName = (req, res, next) => {
  } else if (req.body.role_name.trim().length > 32) {
   next({ status:422, message: 'Role name can not be longer than 32 chars'})
  } else {
+  req.role_name = req.body.role_name.trim();
     next()
  }
 }
